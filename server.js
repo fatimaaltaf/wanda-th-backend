@@ -16,7 +16,7 @@ app.use(
 
 app.get("/", function (req, res) {
   nightmare
-    .goto("https://www.lighthouselabs.com/")
+    .goto("https://www.lighthouselabs.ca/")
     // .goto("https://neilpatel.com/") // test site
     .wait("h1")
     .evaluate((selector) => {
