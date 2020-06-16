@@ -1,8 +1,10 @@
 const express = require("express");
-const request = require("request");
-const cheerio = require("cheerio");
+const Nightmare = require("nightmare");
+const nightmare = Nightmare({ show: true });
 const app = express();
 const cors = require("cors");
+
+const selector = ["h1", "h2", "h3"];
 
 app.use(
   cors({
@@ -10,16 +12,22 @@ app.use(
   })
 );
 
-app.get("/scrape", function (req, res) {
-  url = req.query.url;
-  var $;
-  request(url, function (error, response, html) {
-    if (!error) {
-      $ = cheerio.load(html);
-      // console.log($.html('.row'));
-    }
-    res.send($.html());
-  });
+// const url = req.query.url;
+
+app.get("/", function (req, res) {
+  nightmare
+    .goto("https://www.lighthouselabs.com/")
+    // .goto("https://neilpatel.com/") // test site
+    .wait("h1")
+    .evaluate((selector) => {
+      // now we're executing inside the browser scope.
+      return selector.map((tag) => document.querySelector(tag).innerText);
+    }, selector)
+    .end()
+    .then((text) => res.send(text))
+    .catch((error) => {
+      console.error("Search failed:", error);
+    });
 });
 
 app.listen("5000");
